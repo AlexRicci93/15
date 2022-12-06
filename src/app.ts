@@ -1,10 +1,21 @@
 import express from "express";
 import "express-async-errors";
+import prisma from "./lib/prisma/client";
+import {
+    validate,
+    validationErrorMiddleware,
+    mealsSchema,
+    mealsData
+ } from "./lib/validation";
 
 const app = express();
+app.use(express.json())
 
-app.get("/planets", (request, response) => {
-    response.json([{ name: "Mercury" }, { name: "Venus" }]);
-});
+app.get("/meals", async (request, response) => {
+    const meals = await prisma.meals.findMany()
+    response.json(meals)
+})
 
-export default app;
+app.use(validationErrorMiddleware)
+
+export default app
