@@ -13,6 +13,10 @@ app.get("/meals", async (request, response) => {
     const meals = await client_1.default.meals.findMany();
     response.json(meals);
 });
+app.post("/meals", (0, validation_1.validate)({ body: validation_1.mealsSchema }), async (request, response) => {
+    const meals = request.body;
+    response.status(201).json(meals);
+});
 app.use(validation_1.validationErrorMiddleware);
 exports.default = app;
 //# sourceMappingURL=app.js.map
