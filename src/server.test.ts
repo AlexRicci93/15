@@ -15,7 +15,7 @@ test("GET /meals", async () => {
 ]
 
    //@ts-ignore
-   prismaMock.user.findMany.mockResolvedValue(meals)
+   prismaMock.meals.findMany.mockResolvedValue(meals)
    const response = await request
        .get("/meals")
        .expect(200)
