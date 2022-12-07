@@ -59,3 +59,133 @@ describe("POST /meals", () => {
     });
   });
 });
+
+describe("GET /meals:id", () => {
+  test("Valid request", async () => {
+    const meals = [
+      {
+        id: 1,
+        title: "Carbonara",
+        description: "Un buonissimo piatto di pasta",
+      },
+    ];
+    //@ts-ignore
+    prismaMock.meals.findUnique.mockResolvedValue(meals);
+    const response = await request
+      .get("/meals/1")
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+    expect(response.body).toEqual(meals);
+  });
+  test("Meals does not exist", async () => {
+    //@ts-ignore
+    prismaMock.meals.findUnique.mockResolvedValue(null);
+    const response = await request
+      .get("/meals/23")
+      .expect(404)
+      .expect("Content-Type", /text\/html/);
+    expect(response.text).toContain("Cannot GET /meals/23");
+  });
+  test("Invalid meals ID", async () => {
+    //@ts-ignore
+    prismaMock.meals.findUnique.mockResolvedValue(null);
+    const response = await request
+      .get("/meals/asdf")
+      .expect(404)
+      .expect("Content-Type", /text\/html/);
+    expect(response.text).toContain("Cannot GET /meals/asdf");
+  });
+});
+
+describe("PUT /meals/:id", () => {
+  test("Valid Request", async () => {
+    const meals = {
+      id: 1,
+      title: "Pizza",
+      description: "Una buona pizza margherita",
+    };
+    //@ts-ignore
+    prismaMock.meals.update.mockResolvedValue(meals);
+    const response = await request
+      .put("/meals/1")
+      .send({
+        title: "Pizza",
+        description: "Una buona pizza margherita",
+      })
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+    expect(response.body).toEqual(meals);
+  });
+  test("Invalid Request", async () => {
+    const meals = {
+      description: "Una buona pizza"
+    };
+    const response = await request
+      .put("/meals/23")
+      .send(meals)
+      .expect(422)
+      .expect("Content-Type", /application\/json/);
+    expect(response.body).toEqual({
+      errors: {
+        body: expect.any(Array),
+      },
+    });
+  });
+
+  test("Meals does not exist", async () => {
+    //@ts-ignore
+    prismaMock.meals.update.mockRejectedValue(new Error("Error"));
+    const response = await request
+      .put("/meals/23")
+      .send({
+        title: "Carbonara",
+        description: "Una buonissimo piatto di pasta",
+      })
+      .expect(404)
+      .expect("Content-Type", /text\/html/);
+    expect(response.text).toContain("Cannot PUT /meals/23");
+  });
+
+  test("Invalid meals Id", async () => {
+    //@ts-ignore
+    prismaMock.meals.findUnique.mockResolvedValue(null);
+    const response = await request
+      .put("/meals/asdf")
+      .send({
+        title: "Carbonara",
+        description: "Un buonissimo piatto di pasta",
+      })
+      .expect(404)
+      .expect("Content-Type", /text\/html/);
+    expect(response.text).toContain("Cannot PUT /meals/asdf");
+  });
+});
+
+describe("DELETE /meals/:id", () => {
+  test("Valid request", async () => {
+    const response = await request.delete("/meals/1").expect(204);
+
+    expect(response.text).toEqual("");
+  });
+
+  test("Meals does not exist", async () => {
+    //@ts-ignore
+    prismaMock.meals.delete.mockRejectedValue(new Error("Error"));
+
+    const response = await request
+      .delete("/meals/23")
+      .expect(404)
+      .expect("Content-Type", /text\/html/);
+
+    expect(response.text).toContain("Cannot DELETE /meals/23");
+  });
+
+  test("Invalid meals ID", async () => {
+    const response = await request
+      .delete("/meals/asdf")
+      .expect(404)
+      .expect("Content-Type", /text\/html/);
+
+    expect(response.text).toContain("Cannot DELETE /meals/asdf");
+  });
+});

@@ -17,6 +17,45 @@ app.post("/meals", (0, validation_1.validate)({ body: validation_1.mealsSchema }
     const meals = request.body;
     response.status(201).json(meals);
 });
+app.get("/meals/:id(\\d+)", async (request, response, next) => {
+    const mealsId = Number(request.params.id);
+    const meals = await client_1.default.meals.findUnique({
+        where: { id: mealsId },
+    });
+    if (!meals) {
+        response.status(404);
+        return next(`Cannot GET /meals/${mealsId}`);
+    }
+    response.json(meals);
+});
+app.put("/meals/:id(\\d+)", (0, validation_1.validate)({ body: validation_1.mealsSchema }), async (request, response, next) => {
+    const mealsId = Number(request.params.id);
+    const mealsData = request.body;
+    try {
+        const meals = await client_1.default.meals.update({
+            where: { id: mealsId },
+            data: mealsData,
+        });
+        response.status(200).json(meals);
+    }
+    catch (error) {
+        response.status(404);
+        next(`Cannot PUT /meals/${mealsId}`);
+    }
+});
+app.delete("/meals/:id(\\d+)", async (request, response, next) => {
+    const mealsId = Number(request.params.id);
+    try {
+        await client_1.default.meals.delete({
+            where: { id: mealsId },
+        });
+        response.status(204).end();
+    }
+    catch (error) {
+        response.status(404);
+        next(`Cannot DELETE /meals/${mealsId}`);
+    }
+});
 app.use(validation_1.validationErrorMiddleware);
 exports.default = app;
 //# sourceMappingURL=app.js.map

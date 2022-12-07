@@ -26,6 +26,52 @@ app.post(
   }
 );
 
+app.get("/meals/:id(\\d+)", async (request, response, next) => {
+  const mealsId = Number(request.params.id);
+  const meals = await prisma.meals.findUnique({
+    where: { id: mealsId },
+  });
+  if (!meals) {
+    response.status(404);
+    return next(`Cannot GET /meals/${mealsId}`);
+  }
+  response.json(meals);
+});
+
+app.put(
+  "/meals/:id(\\d+)",
+  validate({ body: mealsSchema }),
+  async (request, response, next) => {
+    const mealsId = Number(request.params.id);
+    const mealsData: mealsData = request.body;
+    try {
+      const meals = await prisma.meals.update({
+        where: { id: mealsId },
+        data: mealsData,
+      });
+      response.status(200).json(meals);
+    } catch (error) {
+      response.status(404);
+      next(`Cannot PUT /meals/${mealsId}`);
+    }
+  }
+);
+
+app.delete("/meals/:id(\\d+)", async (request, response, next) => {
+  const mealsId = Number(request.params.id);
+
+  try {
+    await prisma.meals.delete({
+      where: { id: mealsId },
+    });
+
+    response.status(204).end();
+  } catch (error) {
+    response.status(404);
+    next(`Cannot DELETE /meals/${mealsId}`);
+  }
+});
+
 app.use(validationErrorMiddleware);
 
 export default app;
