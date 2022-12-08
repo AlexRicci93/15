@@ -200,3 +200,33 @@ describe("DELETE /meals/:id", () => {
     expect(response.text).toContain("Cannot DELETE /meals/asdf");
   });
 });
+
+
+
+describe("POST /meals/:id/photo", () => {
+
+  test("Valid request with TXT hello upload", async () => {
+    await request
+        .post("/meals/23/photo")
+        .attach("photo", "test-fixtures/photos/hello.txt")
+        .expect(201)
+        .expect("Access-Control-Allow-Origin", "http://localhost:8080");
+});
+
+  test("Invalid meals ID", async() => {
+      const response = await request
+          .post("/meals/asdf/photo")
+          .expect(404)
+          .expect("Content-Type", /text\/html/ )
+      expect(response.text).toContain("Cannot POST /meals/asdf/photo")
+  });
+
+  test("Invalid request with no file upload", async() =>{
+      const response = await request
+          .post("/meals/23/photo")
+          .expect(400)        //client error - non ha caricato la foto
+          .expect("Content-Type", /text\/html/ )
+      expect(response.text).toContain("No photo file uploaded")
+  });
+});
+

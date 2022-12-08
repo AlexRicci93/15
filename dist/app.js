@@ -6,12 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 require("express-async-errors");
 const cors_1 = __importDefault(require("cors"));
+const multer_1 = require("./lib/middleware/multer");
 const client_1 = __importDefault(require("./lib/prisma/client"));
 const validation_1 = require("./lib/validation");
 const corsOptions = {
     origin: "http://localhost:8080",
     credentials: true,
 };
+const upload = (0, multer_1.initMulterMiddleware)();
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)(corsOptions));
@@ -61,6 +63,15 @@ app.delete("/meals/:id(\\d+)", async (request, response, next) => {
         response.status(404);
         next(`Cannot DELETE /meals/${mealsId}`);
     }
+});
+app.post("/meals/:id(\\d+)/photo", upload.single("photo"), async (request, response, next) => {
+    console.log("request.file", request.file);
+    if (!request.file) {
+        response.status(400);
+        return next("No photo file uploaded");
+    }
+    const photoFilename = request.file.filename;
+    response.status(201).json({ photoFilename });
 });
 app.use(validation_1.validationErrorMiddleware);
 exports.default = app;
