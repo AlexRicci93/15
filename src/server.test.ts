@@ -21,7 +21,8 @@ describe("GET /meals", () => {
     const response = await request
       .get("/meals")
       .expect(200)
-      .expect("Content-Type", /application\/json/);
+      .expect("Content-Type", /application\/json/)
+      .expect("Access-Control-Allow-Origin", "http://localhost:8080");
     expect(response.body).toEqual(meals);
   });
 });
@@ -37,7 +38,9 @@ describe("POST /meals", () => {
       .post("/meals")
       .send(meals)
       .expect(201)
-      .expect("Content-Type", /application\/json/);
+      .expect("Content-Type", /application\/json/)      
+      .expect("Access-Control-Allow-Origin", "http://localhost:8080");
+
     expect(response.body).toEqual(meals);
   });
 
@@ -74,7 +77,9 @@ describe("GET /meals:id", () => {
     const response = await request
       .get("/meals/1")
       .expect(200)
-      .expect("Content-Type", /application\/json/);
+      .expect("Content-Type", /application\/json/)
+      .expect("Access-Control-Allow-Origin", "http://localhost:8080");
+
     expect(response.body).toEqual(meals);
   });
   test("Meals does not exist", async () => {
@@ -113,12 +118,14 @@ describe("PUT /meals/:id", () => {
         description: "Una buona pizza margherita",
       })
       .expect(200)
-      .expect("Content-Type", /application\/json/);
+      .expect("Content-Type", /application\/json/)
+      .expect("Access-Control-Allow-Origin", "http://localhost:8080");
+
     expect(response.body).toEqual(meals);
   });
   test("Invalid Request", async () => {
     const meals = {
-      description: "Una buona pizza"
+      description: "Una buona pizza",
     };
     const response = await request
       .put("/meals/23")
@@ -163,7 +170,10 @@ describe("PUT /meals/:id", () => {
 
 describe("DELETE /meals/:id", () => {
   test("Valid request", async () => {
-    const response = await request.delete("/meals/1").expect(204);
+    const response = await request.delete("/meals/1").
+    expect(204)
+    .expect("Access-Control-Allow-Origin", "http://localhost:8080");
+
 
     expect(response.text).toEqual("");
   });
@@ -175,7 +185,8 @@ describe("DELETE /meals/:id", () => {
     const response = await request
       .delete("/meals/23")
       .expect(404)
-      .expect("Content-Type", /text\/html/);
+      .expect("Content-Type", /text\/html/)
+      
 
     expect(response.text).toContain("Cannot DELETE /meals/23");
   });

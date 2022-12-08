@@ -1,5 +1,6 @@
 import express from "express";
 import "express-async-errors";
+import cors from "cors";
 import prisma from "./lib/prisma/client";
 import {
   validate,
@@ -8,8 +9,14 @@ import {
   mealsData,
 } from "./lib/validation";
 
+const corsOptions = {
+  origin: "http://localhost:8080",
+  credentials: true,
+};
+
 const app = express();
 app.use(express.json());
+app.use(cors(corsOptions))
 
 app.get("/meals", async (request, response) => {
   const meals = await prisma.meals.findMany();
