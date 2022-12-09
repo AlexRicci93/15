@@ -5,74 +5,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 require("express-async-errors");
-const cors_1 = __importDefault(require("cors"));
-const multer_1 = require("./lib/middleware/multer");
-const client_1 = __importDefault(require("./lib/prisma/client"));
-const validation_1 = require("./lib/validation");
-const corsOptions = {
-    origin: "http://localhost:8080",
-    credentials: true,
-};
-const upload = (0, multer_1.initMulterMiddleware)();
+const validation_1 = require("./lib/middleware/validation");
+const cors_1 = require("./lib/middleware/cors");
+const session_1 = require("./lib/middleware/session");
+const passport_1 = require("./lib/middleware/passport");
+const meals_1 = __importDefault(require("./routes/meals"));
+const auth_1 = __importDefault(require("./routes/auth"));
 const app = (0, express_1.default)();
+app.use((0, session_1.initSessionMiddleware)());
+app.use(passport_1.passport.initialize());
+app.use(passport_1.passport.session());
 app.use(express_1.default.json());
-app.use((0, cors_1.default)(corsOptions));
-app.get("/meals", async (request, response) => {
-    const meals = await client_1.default.meals.findMany();
-    response.json(meals);
-});
-app.post("/meals", (0, validation_1.validate)({ body: validation_1.mealsSchema }), async (request, response) => {
-    const meals = request.body;
-    response.status(201).json(meals);
-});
-app.get("/meals/:id(\\d+)", async (request, response, next) => {
-    const mealsId = Number(request.params.id);
-    const meals = await client_1.default.meals.findUnique({
-        where: { id: mealsId },
-    });
-    if (!meals) {
-        response.status(404);
-        return next(`Cannot GET /meals/${mealsId}`);
-    }
-    response.json(meals);
-});
-app.put("/meals/:id(\\d+)", (0, validation_1.validate)({ body: validation_1.mealsSchema }), async (request, response, next) => {
-    const mealsId = Number(request.params.id);
-    const mealsData = request.body;
-    try {
-        const meals = await client_1.default.meals.update({
-            where: { id: mealsId },
-            data: mealsData,
-        });
-        response.status(200).json(meals);
-    }
-    catch (error) {
-        response.status(404);
-        next(`Cannot PUT /meals/${mealsId}`);
-    }
-});
-app.delete("/meals/:id(\\d+)", async (request, response, next) => {
-    const mealsId = Number(request.params.id);
-    try {
-        await client_1.default.meals.delete({
-            where: { id: mealsId },
-        });
-        response.status(204).end();
-    }
-    catch (error) {
-        response.status(404);
-        next(`Cannot DELETE /meals/${mealsId}`);
-    }
-});
-app.post("/meals/:id(\\d+)/photo", upload.single("photo"), async (request, response, next) => {
-    console.log("request.file", request.file);
-    if (!request.file) {
-        response.status(400);
-        return next("No photo file uploaded");
-    }
-    const photoFilename = request.file.filename;
-    response.status(201).json({ photoFilename });
-});
+app.use((0, cors_1.initCorsMiddleware)());
+app.use("/meals", meals_1.default);
+app.use("/auth", auth_1.default);
 app.use(validation_1.validationErrorMiddleware);
 exports.default = app;
 //# sourceMappingURL=app.js.map

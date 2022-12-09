@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import prisma from "../lib/prisma/client";
 import { initMulterMiddleware } from "../lib/middleware/multer";
+import { checkAuthorization } from "../lib/middleware/passport";
 import { validate, mealsSchema, mealsData } from "../lib/middleware/validation";
 
 const upload = initMulterMiddleware();
@@ -12,7 +13,7 @@ router.get("/", async (request, response) => {
   response.json(meals);
 });
 
-router.post("/", validate({ body: mealsSchema }), async (request, response) => {
+router.post("/", checkAuthorization, validate ({ body: mealsSchema }), async (request, response) => {
   const meals: mealsData = request.body;
 
   response.status(201).json(meals);
@@ -32,6 +33,7 @@ router.get("/:id(\\d+)", async (request, response, next) => {
 
 router.put(
   "/:id(\\d+)",
+  checkAuthorization,
   validate({ body: mealsSchema }),
   async (request, response, next) => {
     const mealsId = Number(request.params.id);
@@ -49,7 +51,7 @@ router.put(
   }
 );
 
-router.delete("/:id(\\d+)", async (request, response, next) => {
+router.delete("/:id(\\d+)", checkAuthorization, async (request, response, next) => {
   const mealsId = Number(request.params.id);
 
   try {
@@ -66,6 +68,7 @@ router.delete("/:id(\\d+)", async (request, response, next) => {
 
 router.post(
   "/:id(\\d+)/photo",
+  checkAuthorization, 
   upload.single("photo"),
   async (request, response, next) => {
     console.log("request.file", request.file);

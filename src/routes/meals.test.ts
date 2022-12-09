@@ -23,7 +23,8 @@ describe("GET /meals", () => {
       .get("/meals")
       .expect(200)
       .expect("Content-Type", /application\/json/)
-      .expect("Access-Control-Allow-Origin", "http://localhost:8080");
+      .expect("Access-Control-Allow-Origin", "http://localhost:8080")
+      .expect("Access-Control-Allow-Credentials", "true");
     expect(response.body).toEqual(meals);
   });
 });
@@ -40,7 +41,8 @@ describe("POST /meals", () => {
       .send(meals)
       .expect(201)
       .expect("Content-Type", /application\/json/)      
-      .expect("Access-Control-Allow-Origin", "http://localhost:8080");
+      .expect("Access-Control-Allow-Origin", "http://localhost:8080")
+      .expect("Access-Control-Allow-Credentials", "true");
 
     expect(response.body).toEqual(meals);
   });
@@ -79,7 +81,8 @@ describe("GET /meals:id", () => {
       .get("/meals/1")
       .expect(200)
       .expect("Content-Type", /application\/json/)
-      .expect("Access-Control-Allow-Origin", "http://localhost:8080");
+      .expect("Access-Control-Allow-Origin", "http://localhost:8080")
+      .expect("Access-Control-Allow-Credentials", "true");
 
     expect(response.body).toEqual(meals);
   });
@@ -120,7 +123,8 @@ describe("PUT /meals/:id", () => {
       })
       .expect(200)
       .expect("Content-Type", /application\/json/)
-      .expect("Access-Control-Allow-Origin", "http://localhost:8080");
+      .expect("Access-Control-Allow-Origin", "http://localhost:8080")
+      .expect("Access-Control-Allow-Credentials", "true");
 
     expect(response.body).toEqual(meals);
   });
@@ -173,7 +177,8 @@ describe("DELETE /meals/:id", () => {
   test("Valid request", async () => {
     const response = await request.delete("/meals/1").
     expect(204)
-    .expect("Access-Control-Allow-Origin", "http://localhost:8080");
+    .expect("Access-Control-Allow-Origin", "http://localhost:8080")
+    .expect("Access-Control-Allow-Credentials", "true");
 
 
     expect(response.text).toEqual("");
@@ -211,7 +216,8 @@ describe("POST /meals/:id/photo", () => {
         .post("/meals/23/photo")
         .attach("photo", "test-fixtures/photos/hello.txt")
         .expect(201)
-        .expect("Access-Control-Allow-Origin", "http://localhost:8080");
+        .expect("Access-Control-Allow-Origin", "http://localhost:8080")
+        .expect("Access-Control-Allow-Credentials", "true");
 });
 
   test("Invalid meals ID", async() => {

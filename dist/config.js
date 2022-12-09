@@ -1,5 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const missingSetting = "Warning: No value set for this environment variable";
-
 const config = {
     "PORT": process.env.PORT || missingSetting,
     "SESSION_SECRET": process.env.SESSION_SECRET || missingSetting,
@@ -7,5 +8,5 @@ const config = {
     "GITHUB_CLIENT_SECRET": process.env.GITHUB_CLIENT_SECRET || missingSetting,
     "GITHUB_CALLBACK_URL": process.env.GITHUB_CALLBACK_URL || missingSetting,
 };
-
-export default config;
+exports.default = config;
+//# sourceMappingURL=config.js.map
