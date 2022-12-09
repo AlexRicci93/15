@@ -1,8 +1,9 @@
-import { prismaMock } from "./lib/prisma/client.mock";
+import { prismaMock } from "../lib/prisma/client.mock";
 
 import supertest from "supertest";
 
-import app from "./app";
+import app from "../app";
+
 
 const request = supertest(app);
 
@@ -224,9 +225,10 @@ describe("POST /meals/:id/photo", () => {
   test("Invalid request with no file upload", async() =>{
       const response = await request
           .post("/meals/23/photo")
-          .expect(400)        //client error - non ha caricato la foto
+          .expect(400)        
           .expect("Content-Type", /text\/html/ )
       expect(response.text).toContain("No photo file uploaded")
   });
 });
+
 
